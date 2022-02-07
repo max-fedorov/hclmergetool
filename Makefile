@@ -1,5 +1,5 @@
 appname := hclmergetool
-version := v1.0.0
+version := v1.1.0
 archs := -osarch="linux/amd64" -osarch="darwin/amd64" -osarch="windows/amd64" -osarch="darwin/arm64"
 local_arch := $(shell go env GOARCH)
 local_os := $(shell go env GOOS)

@@ -9,16 +9,20 @@ import (
 )
 
 type Args struct {
-	input    *string
-	template *string
-	output   *string
-	version  *bool
+	input      *string
+	template   *string
+	output     *string
+	version    *bool
+	updateArgs *bool
 }
 
 func parseCliArguments() *Args {
 	args := new(Args)
 	parser := argparse.NewParser("hclmergetool",
-		"Works with HashiCorp HCL. Allows to append the input file with blocks and attributes from the template file")
+		`Works with HashiCorp Configuration Language (HCL) files. `+
+			`Allows you to supplement the input file with blocks and attributes `+
+			`from the template file. You can use any file name (file extension doesn't matter) `+
+			`for the input and template files. The only thing required is valid HCL syntax.`)
 	args.input = parser.String("i", "input", &argparse.Options{Required: false, Help: "path to HCL input file"})
 	args.template = parser.String("t", "template", &argparse.Options{Required: false, Help: "path to HCL template file"})
 	args.output = parser.String("o", "output",
@@ -26,7 +30,14 @@ func parseCliArguments() *Args {
 			Required: false,
 			Help:     "path to HCL output file. If not set, print to stdout",
 		})
+	args.updateArgs = parser.Flag("u", "update-args",
+		&argparse.Options{
+			Required: false,
+			Help: `if set, the values for existing arguments will be updated from ` +
+				`the template values, otherwise, the default value remains`,
+		})
 	args.version = parser.Flag("v", "version", &argparse.Options{Required: false, Help: "show version"})
+
 	err := parser.Parse(os.Args)
 	//fmt.Printf("%#v\n", args)
 	if err != nil {

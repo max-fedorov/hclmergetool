@@ -1,6 +1,6 @@
 # About `hclmergetool`
 
-Works with HashiCorp HCL. Allows to append the input file with blocks and attributes from the template file
+Works with HashiCorp Configuration Language (HCL) files. Allows you to supplement the _input_ file with blocks and attributes from the _template_ file. You can use any file name (file extension doesn't matter) for the _input_ and _template_ files. The only thing required is valid HCL syntax.
 
 # Installation
 
@@ -13,6 +13,9 @@ Latest releases are available here on Github -> [Releases](https://github.com/ma
 
     go install github.com/max-fedorov/hclmergetool@latest
 
+## Update version with Go
+
+    go get -u github.com/max-fedorov/hclmergetool@latest
 
 # Usage
 
@@ -20,16 +23,19 @@ Latest releases are available here on Github -> [Releases](https://github.com/ma
 
 Arguments:
 
-    -i  --input     path to HCL input file. Default: 
-    -t  --template  path to HCL template file. Default: 
-    -o  --output    path to HCL output file. If not specified, print to stdout.
+    -i  --input         path to HCL input file
+    -t  --template      path to HCL template file
+    -o  --output        path to HCL output file. If not specified, print to stdout
+
+    -u  --update-args   if set, the values for existing arguments will be updated from
+                        the template values, otherwise, the default value remains
                   
-    -v  --version   show version
-    -h  --help      print help information
+    -v  --version       show version
+    -h  --help          print help information
   
 # Example
 
-    hclmergetool -i current.tf -t current_templ.tf -o current_override.tf
+    hclmergetool --update-args -i current.tf -t current_templ.tf -o current_override.tf
 
 - current.tf
 

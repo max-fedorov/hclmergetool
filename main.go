@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Version = "1.0.0"
+	Version = "1.1.0"
 	Author  = "Max Fedorov <mail@skam.in>"
 )
 
@@ -21,7 +21,7 @@ func main() {
 
 	configHcl := ReadHclFile(*params.input)
 	templateHcl := ReadHclFile(*params.template)
-	outputHcl := Process(configHcl, templateHcl)
+	outputHcl := Process(configHcl, templateHcl, params.updateArgs)
 
 	if *params.output == "" {
 		fmt.Println(string(outputHcl.Bytes()))

@@ -84,7 +84,7 @@ func getBlocksByLabels(blocks []Block, labels []string) []Block {
 	return out_blocks
 }
 
-func appendBlock(orig *Block, template *Block) *Block {
+func appendBlock(orig *Block, template *Block, updateArgs *bool) *Block {
 	for _, tv := range getChildBlocks(template.Body.Blocks()) {
 		//fmt.Printf("Block_template: %d %s %v", tk, tv.Type, tv.Name)
 		blocks := getBlocksByType(getChildBlocks(orig.Blocks), tv.Type)
@@ -95,20 +95,23 @@ func appendBlock(orig *Block, template *Block) *Block {
 		} else {
 			for _, cv := range blocks {
 				//fmt.Printf("Block_config: %d %s %v", ck, cv.Type, cv.Name)
-				appendBlock(&cv, &tv)
+				appendBlock(&cv, &tv, updateArgs)
 			}
 		}
 	}
 
 	for ck, cv := range template.Attributes {
 		//fmt.Printf("Attr_update: %s %v", ck, cv.Expr())
-		orig.Attributes[ck] = cv
-		orig.Body.SetAttributeRaw(ck, cv.Expr().BuildTokens(nil))
+		_, argExist := orig.Self.Body().Attributes()[ck]
+		if *updateArgs || (!argExist && !*updateArgs) {
+			orig.Attributes[ck] = cv
+			orig.Body.SetAttributeRaw(ck, cv.Expr().BuildTokens(nil))
+		}
 	}
 	return orig
 }
 
-func Process(config *hclwrite.File, template *hclwrite.File) *hclwrite.File {
+func Process(config *hclwrite.File, template *hclwrite.File, updateArgs *bool) *hclwrite.File {
 	rootBlocksConfig := getChildBlocks(config.Body().Blocks())
 	rootBlocksTemplate := getChildBlocks(template.Body().Blocks())
 
@@ -120,15 +123,17 @@ func Process(config *hclwrite.File, template *hclwrite.File) *hclwrite.File {
 		blocks = getBlocksByLabels(blocks, tv.Name)
 		for _, cv := range blocks {
 			//fmt.Printf("Block_config: %d %s %v", ck, cv.Type, cv.Name)
-			appendBlock(&cv, &tv)
+			appendBlock(&cv, &tv, updateArgs)
 		}
-
 	}
 
 	for ck, cv := range rootAttrsTemplate {
-		config.Body().AppendNewline()
-		config.Body().AppendNewline()
-		config.Body().SetAttributeRaw(ck, cv.Expr().BuildTokens(nil))
+		_, argExist := config.Body().Attributes()[ck]
+		if *updateArgs || (!argExist && !*updateArgs) {
+			config.Body().AppendNewline()
+			config.Body().AppendNewline()
+			config.Body().SetAttributeRaw(ck, cv.Expr().BuildTokens(nil))
+		}
 	}
 
 	return config
